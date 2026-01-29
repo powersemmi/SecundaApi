@@ -1,0 +1,39 @@
+name: CI
+
+on:
+  push:
+    branches:
+      - "**"
+
+env:
+  PYTHONPATH: src
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.14"
+          allow-prereleases: true
+      - uses: astral-sh/setup-uv@v5
+        with:
+          cache: true
+      - run: uv sync --frozen --dev
+      - run: uv run ruff check .
+      - run: uv run mypy
+
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.14"
+          allow-prereleases: true
+      - uses: astral-sh/setup-uv@v5
+        with:
+          cache: true
+      - run: uv sync --frozen --dev
+      - run: uv run pytest
