@@ -37,6 +37,7 @@ api = ["alembic.ini"]
 
 [dependency-groups]
 dev = [
+    "httpx==0.28.1",
     "mypy==1.19.1",
     "ruff==0.14.14",
     "pytest==9.0.2",
@@ -80,6 +81,7 @@ extend-ignore = [
 
 [tool.ruff.lint.extend-per-file-ignores]
 "src/tests/**.py" = ["S101"]
+"tests/**.py" = ["S101"]
 
 [tool.ruff.lint.mccabe]
 max-complexity = 7
@@ -108,6 +110,7 @@ disallow_incomplete_defs = false
 
 [tool.pytest.ini_options]
 asyncio_mode = "auto"
+pythonpath = ["src", "tests"]
 
 [tool.logging]
 version = 1
