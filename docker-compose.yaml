@@ -22,6 +22,9 @@ services:
       - type: bind
         source: ./.conf/postgres/init
         target: /docker-entrypoint-initdb.d
+      - type: bind
+        source: ./scripts
+        target: /seed
     ports:
       - "5432:5432"
   backend:
