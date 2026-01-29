@@ -20,6 +20,18 @@ RUN uv sync --frozen --no-dev --no-install-project
 COPY src ./src
 RUN uv sync --frozen --no-dev
 
+FROM builder AS test
+
+ENV PYTHONFAULTHANDLER=1 \
+    PYTHONUNBUFFERED=1 \
+    PYTHON_DISABLE_REMOTE_DEBUG=1 \
+    PATH="/app/.venv/bin:$PATH" \
+    PYTHONPATH="/app/src"
+
+RUN uv sync --frozen --group dev
+
+COPY tests ./tests
+
 FROM python:3.14-slim AS runner
 
 ENV PYTHONFAULTHANDLER=1 \

@@ -38,6 +38,19 @@ services:
     ports:
       - "8000:8000"
     command: bash -c "python -m alembic upgrade head && python -m src.api"
+  backend-test:
+    build:
+      context: .
+      target: test
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      - PG_URL=postgresql+asyncpg://test:test@postgres:5432/app
+    command: bash -c "sleep 5"
+    env_file:
+      - .env.example
+    networks: [ shared ]
   nginx:
     image: nginx:alpine-slim
     restart: always

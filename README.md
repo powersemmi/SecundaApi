@@ -1,8 +1,13 @@
 # Secunda API
 
-Минимальный backend-сервис на FastAPI + SQLAlchemy (async) с миграциями Alembic.
+backend-сервис на FastAPI + SQLAlchemy (async) с миграциями Alembic.
 
-## Быстрый запуск через Docker Compose
+## Требования
+
+- Docker + Docker Compose
+- `just` (опционально, для удобных команд)
+
+## Быстрый запуск
 
 ```bash
 docker compose up --build
@@ -11,7 +16,7 @@ docker compose up --build
 После старта доступны:
 - API через Nginx: `http://localhost:8080`
 - Backend напрямую: `http://localhost:8000/api/v1`
-- OpenApi: `http://localhost:8000/docs`
+- OpenAPI: `http://localhost:8000/docs`
 - Postgres: `localhost:5432`
 
 При запуске `backend` автоматически применяет миграции:
@@ -24,6 +29,12 @@ docker compose up --build
 docker compose down
 ```
 
+Полный запуск через `just` (без dev контейнера):
+
+```bash
+just up
+```
+
 ## Переменные окружения
 
 Основные параметры (см. `src/api/settings.py`):
@@ -33,6 +44,52 @@ docker compose down
 
 В `docker-compose.yaml` значения заданы через `environment`.
 Убедитесь, что имя БД в `PG_URL` совпадает с `POSTGRES_DB` у сервиса Postgres.
+
+## Тесты (в Docker)
+
+В проекте есть `Justfile` с готовыми командами. Все тесты запускаются в
+контейнере `backend-test`, который содержит dev-зависимости.
+
+Unit-тесты (без `postgres`):
+
+```bash
+just test
+```
+
+Интеграционные тесты (требуют Postgres):
+
+```bash
+just test-postgres
+```
+
+Все тесты:
+
+```bash
+just test-all
+```
+
+Остановить и удалить контейнеры и данные:
+
+```bash
+just down
+```
+
+Если `just` не установлен, используйте прямые команды:
+
+```bash
+docker compose up -d postgres
+docker compose run --rm --use-aliases --no-deps backend-test python -m pytest -m "postgres"
+```
+
+## OpenAPI
+
+Сгенерировать `openapi.yaml` из текущего кода:
+
+```bash
+just openapi
+```
+
+Файл сохраняется в корне репозитория как `openapi.yaml`.
 
 ## Структура проекта
 
