@@ -1,3 +1,4 @@
+from importlib import metadata
 from typing import Annotated
 
 from pydantic import PostgresDsn, AfterValidator
@@ -5,12 +6,20 @@ from pydantic_settings import BaseSettings, SettingsConfigDict
 from sqlalchemy.engine import make_url
 
 
-def set_default_driver_name(url: PostgresDsn) -> PostgresDsn:
+def _set_default_driver_name(url: PostgresDsn) -> PostgresDsn:
     return PostgresDsn(
         str(
             make_url(url.unicode_string()).set(drivername="postgresql+asyncpg")
         )
     )
+
+
+def _load_project_metadata(dist_name: str) -> tuple[str | None, str | None]:
+    try:
+        meta = metadata.metadata(dist_name)
+    except metadata.PackageNotFoundError:
+        return None, None
+    return meta.get("Name"), meta.get("Version")
 
 
 class Settings(BaseSettings):
@@ -21,7 +30,7 @@ class Settings(BaseSettings):
     ROOT_PATH: str = "/api/v1"
 
     # DB
-    PG_URL: Annotated[PostgresDsn, AfterValidator(set_default_driver_name)]
+    PG_URL: Annotated[PostgresDsn, AfterValidator(_set_default_driver_name)]
 
     model_config = SettingsConfigDict(
         case_sensitive=True,
@@ -30,5 +39,10 @@ class Settings(BaseSettings):
         extra="allow",
     )
 
+
+DIST_NAME = "secundaapi"
+_service_name, _api_version = _load_project_metadata(DIST_NAME)
+SERVICE_NAME = _service_name or DIST_NAME
+API_VERSION = _api_version or "0.0.0"
 
 settings = Settings()

@@ -19,6 +19,22 @@ dependencies = [
     "sqlalchemy[asyncio]==2.0.46",
 ]
 
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools]
+package-dir = {"" = "src"}
+include-package-data = true
+
+[tool.setuptools.packages.find]
+where = ["src"]
+include = ["api*"]
+namespaces = true
+
+[tool.setuptools.package-data]
+api = ["alembic.ini"]
+
 [dependency-groups]
 dev = [
     "mypy==1.19.1",
