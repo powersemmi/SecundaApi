@@ -1,6 +1,6 @@
 [project]
 name = "secundaapi"
-version = "0.1.0"
+version = "1.0.0"
 description = "Add your description here"
 requires-python = ">=3.14"
 readme = "README.md"
@@ -9,6 +9,7 @@ dependencies = [
     "alembic[tz]==1.18.2",
     "asyncpg==0.31.0",
     "fastapi[all]==0.128.0",
+    "geoalchemy2==0.18.1",
     "hypercorn[h3]==0.18.0",
     "logging518==1.0.0",
     "passlib[bcrypt]==1.7.4",
@@ -37,6 +38,7 @@ api = ["alembic.ini"]
 
 [dependency-groups]
 dev = [
+    "httpx==0.28.1",
     "mypy==1.19.1",
     "ruff==0.14.14",
     "pytest==9.0.2",
@@ -80,6 +82,7 @@ extend-ignore = [
 
 [tool.ruff.lint.extend-per-file-ignores]
 "src/tests/**.py" = ["S101"]
+"tests/**.py" = ["S101"]
 
 [tool.ruff.lint.mccabe]
 max-complexity = 7
@@ -108,6 +111,12 @@ disallow_incomplete_defs = false
 
 [tool.pytest.ini_options]
 asyncio_mode = "auto"
+asyncio_default_fixture_loop_scope = "session"
+asyncio_default_test_loop_scope = "session"
+pythonpath = ["src", "tests"]
+markers = [
+    "postgres: tests that require a running Postgres/PostGIS database",
+]
 
 [tool.logging]
 version = 1
