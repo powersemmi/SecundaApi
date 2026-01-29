@@ -28,6 +28,7 @@ class Settings(BaseSettings):
     DEBUG: bool = False
     WORKERS: int = 1
     ROOT_PATH: str = "/api/v1"
+    API_KEY: str = "test-api-key"
 
     # DB
     PG_URL: Annotated[PostgresDsn, AfterValidator(_set_default_driver_name)]

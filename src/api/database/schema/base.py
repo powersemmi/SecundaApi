@@ -9,9 +9,7 @@ from sqlalchemy.sql.roles import ExpressionElementRole
 
 class Base(DeclarativeBase):
     @classmethod
-    async def _create(
-        cls, session: AsyncSession, **kwargs: dict[str, Any]
-    ) -> Self:
+    async def _create(cls, session: AsyncSession, **kwargs: Any) -> Self:
         obj = cls(**kwargs)
         session.add(obj)
         await session.flush()
@@ -22,7 +20,7 @@ class Base(DeclarativeBase):
         cls,
         session: AsyncSession,
         condition: ExpressionElementRole[Any],
-        **kwargs: dict[str, Any],
+        **kwargs: Any,
     ) -> Self | None:
         return (
             await session.execute(

@@ -3,7 +3,7 @@ networks:
 
 services:
   postgres:
-    image: postgres:alpine
+    image: postgis/postgis:16-3.4-alpine
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U test -d app"]
       interval: 2s
@@ -19,6 +19,9 @@ services:
       - type: bind
         source: ./.conf/postgres/postgresql.conf
         target: /etc/postgresql.conf
+      - type: bind
+        source: ./.conf/postgres/init
+        target: /docker-entrypoint-initdb.d
     ports:
       - "5432:5432"
   backend:
@@ -28,9 +31,9 @@ services:
         condition: service_healthy
     restart: always
     environment:
-      - BIND=0.0.0.0:8000
-      - DEBUG=True
       - PG_URL=postgresql+asyncpg://test:test@postgres:5432/app
+    env_file:
+      - .env.example
     networks: [ shared ]
     ports:
       - "8000:8000"
