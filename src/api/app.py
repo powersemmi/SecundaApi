@@ -1,7 +1,7 @@
 from fastapi import FastAPI
 from starlette.middleware.cors import CORSMiddleware
 
-from api.settings import settings, SERVICE_NAME, API_VERSION
+from api.settings import API_VERSION, SERVICE_NAME, settings
 
 origins = ["*"]
 

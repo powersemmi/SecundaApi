@@ -1,7 +1,7 @@
 from importlib import metadata
 from typing import Annotated
 
-from pydantic import PostgresDsn, AfterValidator
+from pydantic import AfterValidator, PostgresDsn
 from pydantic_settings import BaseSettings, SettingsConfigDict
 from sqlalchemy.engine import make_url
 
