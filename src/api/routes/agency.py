@@ -20,7 +20,9 @@ async def list_agencies(
     session: Annotated[AsyncSession, Depends(get_session)],
 ) -> list[AgencyOut]:
     match params:
-        case AgencyListQuery(building_id=int() as building_id):
+        case AgencyListQuery(
+            building_id=int() as building_id, activity_id=None, name=None
+        ):
             rows = await agency_queries.list_agencies_by_building(
                 session=session,
                 building_id=building_id,
@@ -29,6 +31,8 @@ async def list_agencies(
         case AgencyListQuery(
             activity_id=int() as activity_id,
             include_descendants=bool() as include_descendants,
+            building_id=None,
+            name=None,
         ):
             rows = await agency_queries.list_agencies_by_activity(
                 session=session,
@@ -36,7 +40,9 @@ async def list_agencies(
                 include_descendants=include_descendants,
             )
             return [AgencyOut.model_validate(row) for row in rows]
-        case AgencyListQuery(name=str() as name):
+        case AgencyListQuery(
+            name=str() as name, activity_id=None, building_id=None
+        ):
             rows = await agency_queries.list_agencies_by_name(
                 session=session, name=name
             )
