@@ -63,9 +63,11 @@ class Activity(BaseSchema):
         parent_id: int | None,
     ) -> Self:
         activity = await cls.create(session)
-        await ActivityName.create(session, activity_id=activity.id, name=name)
+        await ActivityName.create(
+            session=session, activity_id=activity.id, name=name
+        )
         await ActivityParent.create(
-            session,
+            session=session,
             activity_id=activity.id,
             parent_id=parent_id,
         )

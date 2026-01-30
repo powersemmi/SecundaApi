@@ -21,7 +21,7 @@ async def create_activity(
 ) -> ActivityOut:
     try:
         activity = await Activity.create_activity(
-            session,
+            session=session,
             name=payload.name,
             parent_id=payload.parent_id,
         )

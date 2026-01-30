@@ -19,34 +19,33 @@ async def list_agencies(
     params: Annotated[AgencyListQuery, Depends()],
     session: Annotated[AsyncSession, Depends(get_session)],
 ) -> list[AgencyOut]:
-    filters = [
-        params.building_id is not None,
-        params.activity_id is not None,
-        params.name is not None,
-    ]
-    if sum(filters) != 1:
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail="Specify exactly one filter.",
-        )
-
-    if params.building_id is not None:
-        rows = await agency_queries.list_agencies_by_building(
-            session,
-            params.building_id,
-        )
-        return [AgencyOut.model_validate(row) for row in rows]
-    if params.activity_id is not None:
-        rows = await agency_queries.list_agencies_by_activity(
-            session,
-            params.activity_id,
-            params.include_descendants,
-        )
-        return [AgencyOut.model_validate(row) for row in rows]
-    rows = await agency_queries.list_agencies_by_name(
-        session, params.name or ""
-    )
-    return [AgencyOut.model_validate(row) for row in rows]
+    match params:
+        case AgencyListQuery(building_id=int() as building_id):
+            rows = await agency_queries.list_agencies_by_building(
+                session=session,
+                building_id=building_id,
+            )
+            return [AgencyOut.model_validate(row) for row in rows]
+        case AgencyListQuery(
+            activity_id=int() as activity_id,
+            include_descendants=bool() as include_descendants,
+        ):
+            rows = await agency_queries.list_agencies_by_activity(
+                session=session,
+                activity_id=activity_id,
+                include_descendants=include_descendants,
+            )
+            return [AgencyOut.model_validate(row) for row in rows]
+        case AgencyListQuery(name=str() as name):
+            rows = await agency_queries.list_agencies_by_name(
+                session=session, name=name
+            )
+            return [AgencyOut.model_validate(row) for row in rows]
+        case _:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="Specify exactly one filter.",
+            )
 
 
 @router.get("/agency/geo", response_model=list[AgencyOut])
@@ -54,7 +53,9 @@ async def list_agencies_by_geo(
     params: Annotated[AgencyGeoQuery, Depends()],
     session: Annotated[AsyncSession, Depends(get_session)],
 ) -> list[AgencyOut]:
-    rows = await agency_queries.list_agencies_by_geo(session, params)
+    rows = await agency_queries.list_agencies_by_geo(
+        session=session, geo=params
+    )
     return [AgencyOut.model_validate(row) for row in rows]
 
 
@@ -63,7 +64,9 @@ async def get_agency(
     agency_id: Annotated[int, Path(ge=1)],
     session: Annotated[AsyncSession, Depends(get_session)],
 ) -> AgencyOut:
-    agency = await agency_queries.get_agency_by_id(session, agency_id)
+    agency = await agency_queries.get_agency_by_id(
+        session=session, agency_id=agency_id
+    )
     if agency is None:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
